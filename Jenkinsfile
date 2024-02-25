@@ -5,8 +5,9 @@ pipeline {
         }
     }
 
-    environment{
+    environment {
        PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
+       GIT_HOME = "/usr/bin/git"
     }
 
 
