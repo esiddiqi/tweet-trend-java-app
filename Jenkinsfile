@@ -29,6 +29,17 @@ pipeline {
           }
         }
 
+//         stage('Sonar Scanner') {
+//             steps {
+//                 script {
+//                     env.JAVA_HOME = tool 'java-17'
+//                     withSonarQubeEnv('sonarqube-server') {
+//                         sh "${tool 'sonar-scanner'}/bin/sonar-scanner"
+//                     }
+//                 }
+//             }
+//         }
+
         stage('test'){
           steps{
             echo "------Unit Test started-------"
@@ -41,5 +52,6 @@ pipeline {
 
     }
 }
+
 
 
