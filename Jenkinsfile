@@ -7,14 +7,15 @@ pipeline {
 
     environment {
        PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
-       GIT_HOME = "/usr/bin/git"
     }
 
-
     stages {
-        stage('Build') {
+        stage('Pull Code') {
             steps {
-               sh 'mvn clean deploy'
+
+              echo "-------------Pulling the code-----------------"
+              git branch: 'main', url: 'https://github.com/esiddiqi/tweet-trend-java-app.git'
+
             }
         }
     }
