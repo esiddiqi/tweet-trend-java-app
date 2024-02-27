@@ -1,4 +1,5 @@
 def registry = 'https://emaad.jfrog.io'
+def imageName = "emaad.jfrog.io/trend-java-pipeline-docker/api-loan-app"
 def version   = '2.1.4'
 
 pipeline {
@@ -67,6 +68,34 @@ pipeline {
             }
         }
     }
+
+
+
+
+    stage("Docker build"){
+      steps{
+        script{
+          echo '<----------- Docker Build Started----------->'
+          app = docker.build(imageName+":"+version)
+          echo '<----------- Docker Build Ends-------------->'
+
+        }
+      }
+    }
+
+
+    stage("Docker Publish"){
+      steps{
+        script{
+          echo '<-----------------Docker Publish Started---------------------->'
+          docker.withRegistry(registry, "artifactory-cred"){
+            app.push()
+          }
+
+        }
+      }
+    }
+
 
 
     }
