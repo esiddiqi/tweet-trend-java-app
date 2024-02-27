@@ -1,57 +1,73 @@
+def registry = 'https://emaad.jfrog.io'
+def version   = '2.1.4'
+
 pipeline {
     agent {
         node {
-          label 'jenkins-maven-slave'
+            label 'master'
         }
     }
 
-
     environment {
-      PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
+        PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
     }
+
 
     stages {
         stage('Pull Code') {
             steps {
-
-              echo "-------------Pulling the code-----------------"
-              git branch: 'main', url: 'https://github.com/esiddiqi/tweet-trend-java-app.git'
-
+                echo "-------------Pulling the code-----------------"
+                git branch: 'main', url: 'https://github.com/esiddiqi/tweet-trend-java-app.git'
             }
         }
 
-        stage('Build'){
-          steps{
-            echo "------Building the Code-------"
-            sh 'mvn clean deploy'
-            echo "------Build complete-------"
-
-          }
+        stage('Build') {
+            steps {
+                echo "------Building the Code-------"
+                sh 'mvn clean deploy'
+                echo "------Build complete-------"
+            }
         }
 
-//         stage('Sonar Scanner') {
-//             steps {
-//                 script {
-//                     env.JAVA_HOME = tool 'java-17'
-//                     withSonarQubeEnv('sonarqube-server') {
-//                         sh "${tool 'sonar-scanner'}/bin/sonar-scanner"
-//                     }
-//                 }
-//             }
-//         }
-
-        stage('test'){
-          steps{
-            echo "------Unit Test started-------"
-            sh 'mvn surefire-report:report'
-            echo "------Unit Test Completed-------"
 
 
-          }
+
+
+        stage('Test') {
+            steps {
+                echo "------Unit Test started-------"
+                sh 'mvn surefire-report:report'
+                echo "------Unit Test Completed-------"
+            }
         }
+
+
+        stage("Jar Publish") {
+        steps {
+            script {
+                    echo '<--------------- Jar Publish Started --------------->'
+                     def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artifactory-cred"
+                     def properties = "buildid=${env.BUILD_ID}";
+                     def uploadSpec = """{
+                          "files": [
+                            {
+                              "pattern": "target/*.jar",
+                              "target": "trend-java-pipeline-javarepo/",
+                              "flat": "false",
+                              "props" : "${properties}",
+                              "exclusions": [ "*.original", "*.exec"]
+                            }
+                         ]
+                     }"""
+                     def buildInfo = server.upload(uploadSpec)
+                     buildInfo.env.collect()
+                     server.publishBuildInfo(buildInfo)
+                     echo '<--------------- Jar Publish Ended --------------->'
+
+            }
+        }
+    }
+
 
     }
 }
-
-
-
