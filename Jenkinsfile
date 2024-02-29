@@ -96,6 +96,21 @@ pipeline {
       }
     }
 
+    stage("Deploy Helm Chart"){
+     steps{
+       script{
+        echo 'STARTED HELM DEPLOY'
+        sh 'helm install java-app /home/ec2-user/java-app-0.1.0.tgz'
+        echo "HELM DEPLOY COMPLETED"
+       }
+
+     }
+    }
+
+
+
+
+
 
 
     }
